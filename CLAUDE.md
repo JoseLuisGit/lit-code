@@ -4,54 +4,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-JSON Visualizer - A project for visualizing JSON data in a visual and interactive way.
+JSON Visualizer - An interactive tool for visualizing JSON data with both a traditional tree view and a 3D node-based visualization using Three.js.
 
 Built with Vue 3, TypeScript, and Vite following functional and declarative programming patterns.
 
 ## Development Commands
 
 ```bash
-# Start development server
-npm run dev
-
-# Build for production (runs TypeScript type checking first)
-npm run build
-
-# Preview production build
-npm run preview
+npm run dev      # Start development server
+npm run build    # TypeScript check + production build
+npm run preview  # Preview production build
 ```
 
 ## Architecture
 
-The project follows a modular, composable architecture with separation of concerns:
+### Data Flow
 
-### Directory Structure
+```
+App.vue (jsonText state)
+    ├── JsonInput.vue (input/format/clear)
+    └── JsonViewer.vue (display)
+            ├── JsonNode.vue (recursive tree view)
+            └── JsonTreeModal.vue (3D visualization)
+                    └── use-tree-visualizer.ts (Three.js scene)
+```
 
-- **src/components/** - Vue components (JsonInput, JsonViewer, JsonNode)
-- **src/composables/** - Reusable composition functions following VueUse patterns
-  - `use-json-validator.ts` - JSON validation and parsing logic
-  - `use-json-node.ts` - JSON node expansion and display logic
-- **src/types/** - TypeScript type definitions and interfaces
-  - `json.ts` - JSON-related types (JsonValue, JsonObject, JsonArray, DataType)
+### Key Components
 
-### Component Responsibilities
+- **JsonInput.vue**: Text input with validation feedback, format and clear buttons
+- **JsonViewer.vue**: Orchestrates display - shows errors, empty state, or parsed JSON with expand/collapse controls
+- **JsonNode.vue**: Recursive component rendering JSON tree with color-coded types
+- **JsonTreeModal.vue**: Full-screen modal with Three.js-powered 3D tree visualization
 
-- **JsonInput.vue**: Handles user input, validation status display, and formatting controls
-- **JsonViewer.vue**: Displays parsed JSON with error handling
-- **JsonNode.vue**: Recursive component for rendering individual JSON nodes with expand/collapse
+### Composables
 
-### Key Patterns
+- **use-json-validator.ts**: Reactive JSON parsing with `isValid`, `hasError`, `parsedData` state
+- **use-json-node.ts**: Node expansion logic, type detection, and formatting helpers
+- **use-tree-visualizer.ts**: Complete Three.js scene management - OrbitControls, raycasting for hover/click, draggable nodes, edge rendering with bezier curves
 
-- Uses Composition API with `<script setup>` syntax exclusively
-- Composables follow functional programming principles with pure functions
-- All business logic is extracted into composables for reusability
-- TypeScript interfaces (not types) for better extendability
-- Descriptive variable names with auxiliary verbs (isValid, hasError, hasContent)
+### Utilities
+
+- **json-to-tree.ts**: Transforms `JsonValue` into `TreeNode` structure for 3D visualization
+
+### Type Definitions
+
+- **types/json.ts**: `JsonValue`, `JsonPrimitive`, `JsonObject`, `JsonArray`, `DataType`, `ValidationResult`
+- **types/tree-visualization.ts**: `TreeNode`, `NodeColorMap`, `NODE_COLORS` constant
+
+## Code Patterns
+
+- Vue Composition API with `<script setup>` exclusively
+- Composables as pure functions returning reactive state and methods
+- Interfaces over types for extendability
+- Descriptive boolean variable names: `isValid`, `hasError`, `hasContent`, `isExpanded`
+- Named exports for functions, use `function` keyword for pure functions
 
 ## Tech Stack
 
-- **Vue 3**: Composition API with `<script setup>` syntax
-- **TypeScript**: Strict typing with interfaces
-- **Vite**: Build tool and dev server
-- **Tailwind CSS**: Utility-first styling with mobile-first responsive design
-- **vue-tsc**: TypeScript compiler for Vue
+- **Vue 3** - Composition API
+- **TypeScript** - Strict typing
+- **Vite** - Build tool
+- **Tailwind CSS** - Utility-first styling
+- **Three.js** - 3D visualization with OrbitControls
