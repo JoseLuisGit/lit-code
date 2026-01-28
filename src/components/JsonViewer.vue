@@ -53,40 +53,40 @@ function resetView(): void {
     <div class="mb-3 flex items-center justify-between flex-wrap gap-2">
       <h2 class="text-xl font-bold text-gray-800">JSON Viewer</h2>
       <div v-if="hasData" class="flex items-center gap-2">
-        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+        <div class="flex items-center gap-2">
           <button
-            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors border-r border-gray-300"
+            class="p-2 text-white font-medium bg-slate-600 hover:bg-slate-700 transition-colors rounded-lg"
             title="Expandir todo"
             @click="expandAll"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
             </svg>
           </button>
           <button
-            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors border-r border-gray-300"
+            class="p-2 text-white font-medium bg-slate-600 hover:bg-slate-700 transition-colors rounded-lg"
             title="Colapsar todo"
             @click="collapseAll"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
             </svg>
           </button>
           <button
-            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+            class="p-2 text-white font-medium bg-slate-600 hover:bg-slate-700 transition-colors rounded-lg"
             title="Resetear vista"
             @click="resetView"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
         </div>
         <button
-          class="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5"
+          class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           @click="openModal"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
           </svg>
           3D
