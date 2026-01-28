@@ -123,6 +123,7 @@ function resetView(): void {
           :isRoot="true"
           :depth="0"
           :initialExpandDepth="initialExpandDepth"
+          :lineNumber="1"
         />
       </div>
     </div>
