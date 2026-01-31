@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useJsonNode } from '../composables/use-json-node'
 import type { JsonValue } from '../types/json'
 
@@ -28,6 +29,43 @@ const {
   getValueColor,
   formatValue
 } = useJsonNode(props.data, props.depth, props.initialExpandDepth)
+
+// Track refs to child components to get their line counts
+const childRefs = ref<Array<{ getTotalLines: () => number }>>([])
+
+// Calculate total lines this node occupies (self + all descendants when expanded)
+function getTotalLines(): number {
+  let total = 1 // This node's line
+
+  if (isExpandable.value && isExpanded.value) {
+    // Add lines from all children
+    childRefs.value.forEach(child => {
+      if (child && child.getTotalLines) {
+        total += child.getTotalLines()
+      }
+    })
+  }
+
+  return total
+}
+
+// Expose getTotalLines for parent components
+defineExpose({ getTotalLines })
+
+// Calculate line number for each child based on cumulative previous siblings
+function getChildLineNumber(index: number): number {
+  let cumulativeLines = props.lineNumber + 1 // Start after this node's line
+
+  // Add lines from all previous siblings
+  for (let i = 0; i < index; i++) {
+    const child = childRefs.value[i]
+    if (child && child.getTotalLines) {
+      cumulativeLines += child.getTotalLines()
+    }
+  }
+
+  return cumulativeLines
+}
 </script>
 
 <template>
@@ -85,11 +123,12 @@ const {
       <JsonNode
         v-for="(entry, index) in entries"
         :key="entry.key"
+        :ref="el => { if (el) childRefs[index] = el as any }"
         :data="entry.value"
         :name="String(entry.key)"
         :depth="depth + 1"
         :initialExpandDepth="initialExpandDepth"
-        :lineNumber="lineNumber + index + 1"
+        :lineNumber="getChildLineNumber(index)"
       />
     </div>
   </div>
