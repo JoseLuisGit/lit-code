@@ -1,6 +1,7 @@
 ---
 name: ui-ux-expert
 description: "Expert UI/UX designer specializing in user-centered design, accessibility (WCAG 2.2), design systems, and responsive interfaces. Use when designing web/mobile applications, implementing accessible interfaces, creating design systems, or conducting usability testing."
+model: sonnet
 ---
 
 # UI/UX Design Expert
