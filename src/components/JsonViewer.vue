@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, onMounted, onUnmounted } from 'vue'
 import { useJsonValidator } from '../composables/use-json-validator'
 import JsonNode from './JsonNode.vue'
 import JsonTreeModal from './JsonTreeModal.vue'
@@ -50,10 +50,36 @@ function resetView(): void {
   initialExpandDepth.value = 2
   viewerKey.value++
 }
+
+const isFullscreen = ref(false)
+
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isFullscreen.value) isFullscreen.value = false
+}
+
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <Teleport to="body" :disabled="!isFullscreen">
+    <div :class="isFullscreen ? 'fixed inset-0 z-50 flex flex-col p-4 md:p-6' : 'flex flex-col h-full'">
+      <!-- Backdrop (fullscreen only) -->
+      <div
+        v-if="isFullscreen"
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        @click="isFullscreen = false"
+      />
+      <!-- Content card -->
+      <div
+        :class="isFullscreen
+          ? ['relative z-10 flex-1 flex flex-col min-h-0 rounded-2xl p-4 md:p-6 overflow-hidden', theme.colors.bgCard, theme.colors.shadow]
+          : 'flex flex-col h-full'"
+      >
     <!-- Header -->
     <div class="mb-4 flex items-center justify-between flex-wrap gap-2">
       <div class="flex items-center gap-2">
@@ -134,6 +160,24 @@ function resetView(): void {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
           </svg>
           <span>Vista 3D</span>
+        </button>
+
+        <!-- Fullscreen Button -->
+        <button
+          @click="toggleFullscreen"
+          class="inline-flex items-center p-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all"
+          :class="isDark
+            ? 'text-slate-300 bg-slate-700 hover:bg-slate-600 focus:ring-slate-500'
+            : 'text-gray-600 bg-gray-100 hover:bg-gray-200 focus:ring-gray-300'"
+          :title="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'"
+          :aria-label="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'"
+        >
+          <svg v-if="!isFullscreen" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m6 0l5-5m0 0v4m0-4h-4M9 15l-5 5m0 0v-4m0 4h4m6 0l5 5m0 0v-4m0 4h-4" />
+          </svg>
         </button>
       </div>
     </div>
@@ -223,5 +267,7 @@ function resetView(): void {
       :jsonData="parsedData"
       @close="closeModal"
     />
-  </div>
+      </div>
+    </div>
+  </Teleport>
 </template>

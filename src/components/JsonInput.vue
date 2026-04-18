@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, computed, ref } from 'vue'
+import { watch, computed, ref, onMounted, onUnmounted } from 'vue'
 import { useJsonValidator } from '../composables/use-json-validator'
 import { useJsonHighlighter } from '../composables/use-json-highlighter'
 import type { Theme } from '../composables/use-theme'
@@ -24,6 +24,7 @@ const {
   isValid,
   hasContent,
   formatJson,
+  compactJson,
   clearJson,
   setJsonText
 } = useJsonValidator(props.modelValue)
@@ -91,10 +92,36 @@ async function copyToClipboard() {
     await navigator.clipboard.writeText(jsonText.value)
   }
 }
+
+const isFullscreen = ref(false)
+
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isFullscreen.value) isFullscreen.value = false
+}
+
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <Teleport to="body" :disabled="!isFullscreen">
+    <div :class="isFullscreen ? 'fixed inset-0 z-50 flex flex-col p-4 md:p-6' : 'flex flex-col h-full'">
+      <!-- Backdrop (fullscreen only) -->
+      <div
+        v-if="isFullscreen"
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        @click="isFullscreen = false"
+      />
+      <!-- Content card -->
+      <div
+        :class="isFullscreen
+          ? ['relative z-10 flex-1 flex flex-col min-h-0 rounded-2xl p-4 md:p-6 overflow-hidden', theme.colors.bgCard, theme.colors.shadow]
+          : 'flex flex-col h-full'"
+      >
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
@@ -158,6 +185,21 @@ async function copyToClipboard() {
           <span class="hidden sm:inline">Formatear</span>
         </button>
         <button
+          @click="compactJson"
+          :disabled="!hasContent || !isValid"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="isDark
+            ? 'text-slate-300 bg-slate-700 hover:bg-slate-600 focus:ring-slate-500'
+            : 'text-gray-600 bg-gray-100 hover:bg-gray-200 focus:ring-gray-300'"
+          title="Compactar JSON"
+          aria-label="Compactar JSON"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+          </svg>
+          <span class="hidden sm:inline">Compacto</span>
+        </button>
+        <button
           @click="clearJson"
           :disabled="!hasContent"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -169,6 +211,22 @@ async function copyToClipboard() {
         >
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+        <button
+          @click="toggleFullscreen"
+          class="inline-flex items-center p-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all"
+          :class="isDark
+            ? 'text-slate-300 bg-slate-700 hover:bg-slate-600 focus:ring-slate-500'
+            : 'text-gray-600 bg-gray-100 hover:bg-gray-200 focus:ring-gray-300'"
+          :title="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'"
+          :aria-label="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'"
+        >
+          <svg v-if="!isFullscreen" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m6 0l5-5m0 0v4m0-4h-4M9 15l-5 5m0 0v-4m0 4h4m6 0l5 5m0 0v-4m0 4h-4" />
           </svg>
         </button>
       </div>
@@ -282,6 +340,8 @@ async function copyToClipboard() {
           :class="isDark ? 'text-emerald-400' : 'text-emerald-600'"
         >{{ lineNumbers.length }} líneas</span>
       </div>
+      </div>
     </div>
-  </div>
+    </div>
+  </Teleport>
 </template>

@@ -39,6 +39,11 @@ export function useJsonValidator(initialValue = '') {
     }
   }
 
+  function compactJson() {
+    if (!hasContent.value || !isValid.value) return
+    jsonText.value = JSON.stringify(JSON.parse(jsonText.value))
+  }
+
   function clearJson() {
     jsonText.value = ''
     errorMessage.value = null
@@ -59,6 +64,7 @@ export function useJsonValidator(initialValue = '') {
     hasError,
     hasContent,
     formatJson,
+    compactJson,
     clearJson,
     setJsonText
   }
