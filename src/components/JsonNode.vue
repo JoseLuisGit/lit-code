@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useJsonNode } from '../composables/use-json-node'
 import type { JsonValue } from '../types/json'
-import type { Theme } from '../composables/use-theme'
+import type { Theme, ThemeColors } from '../composables/use-theme'
 
 interface Props {
   data: JsonValue
@@ -22,6 +22,17 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const isDark = computed(() => props.theme?.name === 'dark' || props.theme?.name === 'midnight')
+
+type JsonColorKey = keyof Pick<ThemeColors, 'jsonString' | 'jsonNumber' | 'jsonBoolean' | 'jsonNull' | 'jsonObject' | 'jsonArray'>
+
+const JSON_COLOR_KEYS: Record<string, JsonColorKey> = {
+  string: 'jsonString',
+  number: 'jsonNumber',
+  boolean: 'jsonBoolean',
+  null: 'jsonNull',
+  object: 'jsonObject',
+  array: 'jsonArray',
+}
 
 const {
   isExpanded,
@@ -70,7 +81,8 @@ function getTypeBadgeColor(type: string): string {
 
 function getValueColor(type: string): string {
   if (props.theme) {
-    return props.theme.colors[`json${type.charAt(0).toUpperCase() + type.slice(1)}` as keyof typeof props.theme.colors] || props.theme.colors.textSecondary
+    const key = JSON_COLOR_KEYS[type]
+    return key ? props.theme.colors[key] : props.theme.colors.textSecondary
   }
   switch (type) {
     case 'string': return 'text-emerald-600'

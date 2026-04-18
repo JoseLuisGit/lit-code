@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { watch, computed, ref } from 'vue'
 import { useJsonValidator } from '../composables/use-json-validator'
+import { useJsonHighlighter } from '../composables/use-json-highlighter'
 import type { Theme } from '../composables/use-theme'
 
 interface Props {
@@ -27,8 +28,14 @@ const {
   setJsonText
 } = useJsonValidator(props.modelValue)
 
+const { highlightedHtml } = useJsonHighlighter(
+  () => jsonText.value,
+  () => props.theme
+)
+
 const lineNumbersRef = ref<HTMLDivElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const preRef = ref<HTMLPreElement | null>(null)
 const isFocused = ref(false)
 
 const lineNumbers = computed(() => {
@@ -43,6 +50,10 @@ watch(jsonText, (newValue) => {
 function handleScroll() {
   if (lineNumbersRef.value && textareaRef.value) {
     lineNumbersRef.value.scrollTop = textareaRef.value.scrollTop
+  }
+  if (preRef.value && textareaRef.value) {
+    preRef.value.scrollTop = textareaRef.value.scrollTop
+    preRef.value.scrollLeft = textareaRef.value.scrollLeft
   }
 }
 
@@ -194,22 +205,33 @@ async function copyToClipboard() {
         </div>
       </div>
 
-      <!-- Textarea -->
-      <textarea
-        ref="textareaRef"
-        v-model="jsonText"
-        @paste="handlePaste"
-        @scroll="handleScroll"
-        @focus="isFocused = true"
-        @blur="isFocused = false"
-        placeholder="Pega o escribe tu JSON aquí..."
-        class="flex-1 p-4 font-mono text-sm leading-5 focus:outline-none resize-none bg-transparent transition-colors duration-300"
-        :class="[
-          isDark ? 'text-slate-200 placeholder:text-slate-500' : 'text-gray-800 placeholder:text-gray-400'
-        ]"
-        aria-label="Editor de JSON"
-        spellcheck="false"
-      ></textarea>
+      <!-- Syntax highlight layer + transparent textarea overlay -->
+      <div class="relative flex-1 overflow-hidden">
+        <!-- Highlighted pre layer (pointer-events:none, visually underneath) -->
+        <pre
+          ref="preRef"
+          class="absolute inset-0 m-0 p-4 font-mono text-sm leading-5 whitespace-pre-wrap break-words pointer-events-none overflow-hidden select-none"
+          :class="isDark ? 'text-slate-200' : 'text-gray-800'"
+          aria-hidden="true"
+          v-html="highlightedHtml || ''"
+        ></pre>
+
+        <!-- Transparent textarea — captures input, shows only the caret -->
+        <textarea
+          ref="textareaRef"
+          v-model="jsonText"
+          @paste="handlePaste"
+          @scroll="handleScroll"
+          @focus="isFocused = true"
+          @blur="isFocused = false"
+          placeholder="Pega o escribe tu JSON aquí..."
+          class="absolute inset-0 w-full h-full p-4 font-mono text-sm leading-5 focus:outline-none resize-none bg-transparent whitespace-pre-wrap break-words"
+          :class="isDark ? 'placeholder:text-slate-500' : 'placeholder:text-gray-400'"
+          :style="{ '-webkit-text-fill-color': 'transparent', color: 'transparent', 'caret-color': isDark ? '#e2e8f0' : '#374151' }"
+          aria-label="Editor de JSON"
+          spellcheck="false"
+        ></textarea>
+      </div>
     </div>
 
     <!-- Status Messages -->

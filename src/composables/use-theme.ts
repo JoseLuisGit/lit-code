@@ -38,6 +38,16 @@ export interface ThemeColors {
   jsonObject: string
   jsonArray: string
 
+  // Syntax colors for input highlighting
+  syntaxColors: {
+    key: string         // JSON object keys ("name":) — strong green
+    string: string      // string values — lighter green
+    number: string      // number values — blue
+    boolean: string     // boolean values — lilac/violet
+    null: string        // null values — gray
+    punctuation: string // { } [ ] : , — muted
+  }
+
   // Shadows
   shadow: string
   shadowLg: string
@@ -79,6 +89,14 @@ const themes: Record<ThemeName, Theme> = {
       jsonNull: 'text-gray-500',
       jsonObject: 'text-orange-600',
       jsonArray: 'text-cyan-600',
+      syntaxColors: {
+        key: '#166534',
+        string: '#16a34a',
+        number: '#1d4ed8',
+        boolean: '#6d28d9',
+        null: '#6b7280',
+        punctuation: '#9ca3af',
+      },
       shadow: 'shadow-soft',
       shadowLg: 'shadow-soft-lg',
     },
@@ -111,6 +129,14 @@ const themes: Record<ThemeName, Theme> = {
       jsonNull: 'text-gray-500',
       jsonObject: 'text-orange-400',
       jsonArray: 'text-cyan-400',
+      syntaxColors: {
+        key: '#6ee7b7',
+        string: '#34d399',
+        number: '#60a5fa',
+        boolean: '#a78bfa',
+        null: '#6b7280',
+        punctuation: '#4b5563',
+      },
       shadow: 'shadow-xl shadow-black/20',
       shadowLg: 'shadow-2xl shadow-black/30',
     },
@@ -143,6 +169,14 @@ const themes: Record<ThemeName, Theme> = {
       jsonNull: 'text-slate-500',
       jsonObject: 'text-amber-400',
       jsonArray: 'text-sky-400',
+      syntaxColors: {
+        key: '#99f6e4',
+        string: '#5eead4',
+        number: '#818cf8',
+        boolean: '#c084fc',
+        null: '#64748b',
+        punctuation: '#475569',
+      },
       shadow: 'shadow-xl shadow-indigo-950/50',
       shadowLg: 'shadow-2xl shadow-indigo-950/60',
     },
@@ -175,6 +209,14 @@ const themes: Record<ThemeName, Theme> = {
       jsonNull: 'text-emerald-400',
       jsonObject: 'text-amber-600',
       jsonArray: 'text-cyan-600',
+      syntaxColors: {
+        key: '#14532d',
+        string: '#166534',
+        number: '#134e4a',
+        boolean: '#3f6212',
+        null: '#6b7280',
+        punctuation: '#6b7280',
+      },
       shadow: 'shadow-lg shadow-emerald-100',
       shadowLg: 'shadow-xl shadow-emerald-200',
     },
@@ -207,6 +249,14 @@ const themes: Record<ThemeName, Theme> = {
       jsonNull: 'text-gray-500',
       jsonObject: 'text-amber-600',
       jsonArray: 'text-pink-600',
+      syntaxColors: {
+        key: '#881337',
+        string: '#be123c',
+        number: '#9a3412',
+        boolean: '#6b21a8',
+        null: '#6b7280',
+        punctuation: '#9ca3af',
+      },
       shadow: 'shadow-lg shadow-orange-100',
       shadowLg: 'shadow-xl shadow-orange-200',
     },
