@@ -1,12 +1,11 @@
 import { ref, computed } from 'vue'
 import type { JsonValue, JsonNodeEntry, DataType } from '../types/json'
 
-const MAX_STRING_LENGTH = 100
-
-export function useJsonNode(data: JsonValue, depth: number = 0, initialExpandDepth: number = 2) {
+export function useJsonNode(getData: () => JsonValue, depth: number = 0, initialExpandDepth: number = 2) {
   const isExpanded = ref(depth < initialExpandDepth)
 
   const dataType = computed<DataType>(() => {
+    const data = getData()
     if (data === null) return 'null'
     if (Array.isArray(data)) return 'array'
     return typeof data as DataType
@@ -17,6 +16,7 @@ export function useJsonNode(data: JsonValue, depth: number = 0, initialExpandDep
   })
 
   const itemCount = computed(() => {
+    const data = getData()
     if (dataType.value === 'array' && Array.isArray(data)) return data.length
     if (dataType.value === 'object' && typeof data === 'object' && data !== null) {
       return Object.keys(data).length
@@ -25,6 +25,7 @@ export function useJsonNode(data: JsonValue, depth: number = 0, initialExpandDep
   })
 
   const entries = computed<JsonNodeEntry[]>(() => {
+    const data = getData()
     if (dataType.value === 'array' && Array.isArray(data)) {
       return data.map((item, index) => ({
         key: index,
@@ -60,9 +61,6 @@ export function useJsonNode(data: JsonValue, depth: number = 0, initialExpandDep
 
   function formatValue(value: JsonValue): string {
     if (typeof value === 'string') {
-      if (value.length > MAX_STRING_LENGTH) {
-        return `"${value.slice(0, MAX_STRING_LENGTH)}…"`
-      }
       return `"${value}"`
     }
     if (value === null) return 'null'

@@ -42,7 +42,7 @@ const {
   entries,
   toggleExpand,
   formatValue
-} = useJsonNode(props.data, props.depth, props.initialExpandDepth)
+} = useJsonNode(() => props.data, props.depth, props.initialExpandDepth)
 
 function getTypeIcon(type: string): string {
   switch (type) {
@@ -181,7 +181,7 @@ function getValueColor(type: string): string {
         <span
           v-else
           :class="getValueColor(dataType)"
-          class="font-mono text-sm break-words max-w-lg"
+          class="font-mono text-sm break-all"
         >
           {{ formatValue(data) }}
         </span>
