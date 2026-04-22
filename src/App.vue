@@ -4,6 +4,7 @@ import HomeView from './views/HomeView.vue'
 import JsonViewerView from './views/JsonViewerView.vue'
 import TextCompareView from './views/TextCompareView.vue'
 import Base64View from './views/Base64View.vue'
+import ColorPaletteView from './views/ColorPaletteView.vue'
 import { useTheme } from './composables/use-theme'
 
 const { currentTheme } = useTheme()
@@ -42,6 +43,11 @@ function goHome(): void {
       <Base64View
         v-else-if="currentToolId === 'base64'"
         key="base64"
+        @back="goHome"
+      />
+      <ColorPaletteView
+        v-else-if="currentToolId === 'color-palette'"
+        key="color-palette"
         @back="goHome"
       />
     </Transition>
