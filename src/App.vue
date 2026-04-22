@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import HomeView from './views/HomeView.vue'
 import JsonViewerView from './views/JsonViewerView.vue'
 import TextCompareView from './views/TextCompareView.vue'
+import Base64View from './views/Base64View.vue'
 import { useTheme } from './composables/use-theme'
 
 const { currentTheme } = useTheme()
@@ -36,6 +37,11 @@ function goHome(): void {
       <TextCompareView
         v-else-if="currentToolId === 'text-compare'"
         key="text-compare"
+        @back="goHome"
+      />
+      <Base64View
+        v-else-if="currentToolId === 'base64'"
+        key="base64"
         @back="goHome"
       />
     </Transition>
