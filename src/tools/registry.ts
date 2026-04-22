@@ -21,6 +21,15 @@ export const toolRegistry: Tool[] = [
     tags: ['data', 'format', 'json'],
   },
   {
+    id: 'text-compare',
+    name: 'Text Compare',
+    description: 'Compare two texts side-by-side with line and character-level diff highlighting.',
+    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    iconViewBox: '0 0 24 24',
+    status: 'active',
+    tags: ['diff', 'text', 'compare'],
+  },
+  {
     id: 'base64',
     name: 'Base64 Encoder',
     description: 'Encode and decode Base64 strings instantly with support for files and plain text.',

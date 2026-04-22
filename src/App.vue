@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import HomeView from './views/HomeView.vue'
 import JsonViewerView from './views/JsonViewerView.vue'
+import TextCompareView from './views/TextCompareView.vue'
 import { useTheme } from './composables/use-theme'
 
 const { currentTheme } = useTheme()
@@ -30,6 +31,11 @@ function goHome(): void {
       <JsonViewerView
         v-else-if="currentToolId === 'json-viewer'"
         key="json-viewer"
+        @back="goHome"
+      />
+      <TextCompareView
+        v-else-if="currentToolId === 'text-compare'"
+        key="text-compare"
         @back="goHome"
       />
     </Transition>
