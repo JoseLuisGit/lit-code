@@ -5,6 +5,7 @@ import JsonViewerView from './views/JsonViewerView.vue'
 import TextCompareView from './views/TextCompareView.vue'
 import Base64View from './views/Base64View.vue'
 import ColorPaletteView from './views/ColorPaletteView.vue'
+import ImageEditorView from './views/ImageEditorView.vue'
 import { useTheme } from './composables/use-theme'
 
 const { currentTheme } = useTheme()
@@ -48,6 +49,11 @@ function goHome(): void {
       <ColorPaletteView
         v-else-if="currentToolId === 'color-palette'"
         key="color-palette"
+        @back="goHome"
+      />
+      <ImageEditorView
+        v-else-if="currentToolId === 'image-editor'"
+        key="image-editor"
         @back="goHome"
       />
     </Transition>
