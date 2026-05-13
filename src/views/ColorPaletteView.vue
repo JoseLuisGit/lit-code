@@ -5,8 +5,6 @@ import { useTheme } from '../composables/use-theme'
 import { useColorPalette } from '../composables/use-color-palette'
 import { getContrastColor } from '../utils/color-utils'
 
-defineEmits<{ (e: 'back'): void }>()
-
 const { currentTheme } = useTheme()
 const isDarkTheme = computed(() =>
   currentTheme.value.name === 'dark' || currentTheme.value.name === 'midnight'
@@ -61,7 +59,6 @@ function onHexBlur(): void {
     <ToolHeader
       tool-name="Color Palette"
       tool-description="Convert HEX/RGB/HSL and generate color palettes"
-      @back="$emit('back')"
     />
 
     <div class="flex-1 flex flex-col gap-4 overflow-hidden">

@@ -5,8 +5,6 @@ import { useTheme } from '../composables/use-theme'
 import { useImageEditor } from '../composables/use-image-editor'
 import { useJsonHighlighter } from '../composables/use-json-highlighter'
 
-defineEmits<{ (e: 'back'): void }>()
-
 const { currentTheme } = useTheme()
 const isDarkTheme = computed(() =>
   currentTheme.value.name === 'dark' || currentTheme.value.name === 'midnight'
@@ -119,7 +117,6 @@ watch(imageSize, () => render())
     <ToolHeader
       tool-name="Image Editor"
       tool-description="Crop, flip, and rotate images with interactive canvas controls"
-      @back="$emit('back')"
     />
 
     <div class="flex-1 grid lg:grid-cols-[1fr_280px] gap-4 overflow-hidden min-h-0">

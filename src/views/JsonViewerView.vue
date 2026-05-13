@@ -5,8 +5,6 @@ import JsonViewer from '../components/JsonViewer.vue'
 import ToolHeader from '../components/ToolHeader.vue'
 import { useTheme } from '../composables/use-theme'
 
-defineEmits<{ (e: 'back'): void }>()
-
 const { currentTheme } = useTheme()
 const jsonText = ref('')
 
@@ -20,7 +18,6 @@ const isDarkTheme = computed(() =>
     <ToolHeader
       tool-name="JSON Viewer"
       tool-description="Visualize and explore JSON structures interactively"
-      @back="$emit('back')"
     />
 
     <!-- Main Content - Two Columns -->

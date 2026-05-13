@@ -5,8 +5,6 @@ import DiffOutputPanel from '../components/DiffOutputPanel.vue'
 import { useTheme } from '../composables/use-theme'
 import { useTextDiff } from '../composables/use-text-diff'
 
-defineEmits<{ (e: 'back'): void }>()
-
 const { currentTheme } = useTheme()
 
 const isDarkTheme = computed(() =>
@@ -79,7 +77,6 @@ watch(currentPairIndex, (pairIdx) => {
     <ToolHeader
       tool-name="Text Compare"
       tool-description="Compare two texts with line and character-level diff"
-      @back="$emit('back')"
     />
 
     <div class="flex-1 flex flex-col gap-3 overflow-hidden">

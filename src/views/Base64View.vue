@@ -5,8 +5,6 @@ import { useTheme } from '../composables/use-theme'
 import { useBase64 } from '../composables/use-base64'
 import { formatFileSize } from '../utils/base64'
 
-defineEmits<{ (e: 'back'): void }>()
-
 const { currentTheme } = useTheme()
 const isDarkTheme = computed(() =>
   currentTheme.value.name === 'dark' || currentTheme.value.name === 'midnight'
@@ -109,7 +107,6 @@ const textareaClass = computed(() => [
     <ToolHeader
       tool-name="Base64"
       tool-description="Encode and decode text or files to/from Base64"
-      @back="$emit('back')"
     />
 
     <div class="flex-1 flex flex-col gap-4 overflow-hidden">

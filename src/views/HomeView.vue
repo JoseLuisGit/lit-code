@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import ThemeSelector from '../components/ThemeSelector.vue'
 import { useTheme } from '../composables/use-theme'
 import { toolRegistry, type Tool } from '../tools/registry'
 
-const emit = defineEmits<{ (e: 'select-tool', toolId: string): void }>()
-
+const router = useRouter()
 const { currentTheme } = useTheme()
 
 const isDarkTheme = computed(() =>
@@ -14,7 +14,7 @@ const isDarkTheme = computed(() =>
 
 function handleCardClick(tool: Tool): void {
   if (tool.status !== 'active') return
-  emit('select-tool', tool.id)
+  router.push(`/${tool.id}`)
 }
 </script>
 
