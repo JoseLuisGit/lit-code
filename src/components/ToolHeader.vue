@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import ThemeSelector from './ThemeSelector.vue'
 import { useTheme } from '../composables/use-theme'
 
@@ -9,13 +10,17 @@ interface Props {
 }
 
 defineProps<Props>()
-defineEmits<{ (e: 'back'): void }>()
 
+const router = useRouter()
 const { currentTheme } = useTheme()
 
 const isDarkTheme = computed(() =>
   currentTheme.value.name === 'dark' || currentTheme.value.name === 'midnight'
 )
+
+function goHome(): void {
+  router.push('/')
+}
 </script>
 
 <template>
@@ -30,7 +35,7 @@ const isDarkTheme = computed(() =>
               ? 'text-gray-400 hover:text-gray-200 hover:bg-white/10'
               : 'text-gray-500 hover:text-gray-800 hover:bg-black/5'
           ]"
-          @click="$emit('back')"
+          @click="goHome"
           aria-label="Go back to home"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

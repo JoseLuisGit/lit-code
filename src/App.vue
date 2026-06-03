@@ -1,23 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import HomeView from './views/HomeView.vue'
-import JsonViewerView from './views/JsonViewerView.vue'
-import TextCompareView from './views/TextCompareView.vue'
-import Base64View from './views/Base64View.vue'
-import ColorPaletteView from './views/ColorPaletteView.vue'
-import ImageEditorView from './views/ImageEditorView.vue'
+import { RouterView } from 'vue-router'
 import { useTheme } from './composables/use-theme'
 
 const { currentTheme } = useTheme()
-const currentToolId = ref<string | null>(null)
-
-function selectTool(toolId: string): void {
-  currentToolId.value = toolId
-}
-
-function goHome(): void {
-  currentToolId.value = null
-}
 </script>
 
 <template>
@@ -25,38 +10,11 @@ function goHome(): void {
     class="min-h-screen w-full bg-gradient-to-br p-4 md:p-6 lg:p-8 transition-colors duration-300"
     :class="currentTheme.colors.bgPrimary"
   >
-    <Transition name="view" mode="out-in">
-      <HomeView
-        v-if="currentToolId === null"
-        key="home"
-        @select-tool="selectTool"
-      />
-      <JsonViewerView
-        v-else-if="currentToolId === 'json-viewer'"
-        key="json-viewer"
-        @back="goHome"
-      />
-      <TextCompareView
-        v-else-if="currentToolId === 'text-compare'"
-        key="text-compare"
-        @back="goHome"
-      />
-      <Base64View
-        v-else-if="currentToolId === 'base64'"
-        key="base64"
-        @back="goHome"
-      />
-      <ColorPaletteView
-        v-else-if="currentToolId === 'color-palette'"
-        key="color-palette"
-        @back="goHome"
-      />
-      <ImageEditorView
-        v-else-if="currentToolId === 'image-editor'"
-        key="image-editor"
-        @back="goHome"
-      />
-    </Transition>
+    <RouterView v-slot="{ Component, route }">
+      <Transition name="view" mode="out-in">
+        <component :is="Component" :key="route.path" />
+      </Transition>
+    </RouterView>
   </div>
 </template>
 
