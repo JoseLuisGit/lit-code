@@ -9,7 +9,6 @@ A collection of developer tools built with Vue 3, TypeScript, and Tailwind CSS. 
 - Expandable/collapsible tree view with color-coded types
 - Automatic JSON formatting and compaction
 - Syntax highlighting in the editor
-- Interactive 3D visualization with Three.js (draggable nodes, orbit controls, hover info panel)
 
 ### Text Compare
 - Side-by-side text comparison with line-level diff (LCS algorithm)
@@ -69,4 +68,3 @@ components/ToolHeader.vue          # Reusable header with back button + ThemeSel
 - **TypeScript** — strict mode
 - **Vite** — build tool
 - **Tailwind CSS** — utility-first styling
-- **Three.js** — 3D visualization (JSON Viewer)

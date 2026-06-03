@@ -35,7 +35,6 @@
 | Language | TypeScript | ~5.9.3 |
 | Build Tool | Vite | 7.2.4 |
 | Styling | Tailwind CSS | 3.4.19 |
-| 3D Visualization | Three.js | 0.182.0 |
 | Type Checker | vue-tsc | 3.1.4 |
 | Deployment | gh-pages | 6.2.0 |
 
@@ -64,7 +63,6 @@ src/
 │   ├── JsonInput.vue
 │   ├── JsonViewer.vue
 │   ├── JsonNode.vue
-│   ├── JsonTreeModal.vue
 │   └── DiffOutputPanel.vue
 │
 ├── composables/                     # Vue 3 composables — state + logic
@@ -72,14 +70,12 @@ src/
 │   ├── use-json-validator.ts
 │   ├── use-json-highlighter.ts
 │   ├── use-json-node.ts
-│   ├── use-tree-visualizer.ts
 │   ├── use-text-diff.ts
 │   ├── use-base64.ts
 │   ├── use-color-palette.ts
 │   └── use-image-editor.ts
 │
 ├── utils/                           # Pure utility functions
-│   ├── json-to-tree.ts
 │   ├── text-diff.ts
 │   ├── base64.ts
 │   ├── color-utils.ts
@@ -87,7 +83,6 @@ src/
 │
 └── types/                           # TypeScript type definitions
     ├── json.ts
-    ├── tree-visualization.ts
     └── image-editor.ts
 ```
 
@@ -95,7 +90,7 @@ src/
 
 | Tool | ID | Description |
 |------|----|-------------|
-| JSON Viewer | `json-viewer` | Parse, format, tree-view, and 3D-visualize JSON |
+| JSON Viewer | `json-viewer` | Parse, format, and tree-view JSON |
 | Text Compare | `text-compare` | LCS-based side-by-side diff with char-level highlighting |
 | Base64 | `base64` | Encode/decode text and binary files |
 | Color Palette | `color-palette` | HEX/RGB/HSL conversion with 6 color-harmony generators |
@@ -468,11 +463,8 @@ JsonViewerView.vue
 │   ├── useJsonValidator()
 │   └── useJsonHighlighter()
 └── JsonViewer.vue
-    ├── JsonNode.vue (recursive)
-    │   └── useJsonNode()
-    └── JsonTreeModal.vue
-        └── useTreeVisualizer()
-            └── Three.js scene
+    └── JsonNode.vue (recursive)
+        └── useJsonNode()
 ```
 
 ### Data Flow
@@ -487,11 +479,7 @@ User types JSON text
         │
         ├── useJsonHighlighter → tokenize() → highlightedHtml (for input overlay)
         │
-        └── parsedData → jsonToTree() → TreeNode
-                                │
-                                ├── JsonViewer renders JsonNode tree
-                                │
-                                └── JsonTreeModal → useTreeVisualizer → Three.js
+        └── parsedData → JsonViewer renders JsonNode tree
 ```
 
 ---
@@ -693,241 +681,6 @@ function getTypeLabel(type: DataType, count: number): string {
 ```
 
 Renders the collapsed preview (e.g. `Array[3]`, `Object{5}`).
-
----
-
-### `json-to-tree.ts` — `src/utils/json-to-tree.ts`
-
-Converts a `JsonValue` into a `TreeNode` tree for 3D visualization.
-
-**Module-level counter:**
-
-```typescript
-let nodeIdCounter = 0
-```
-
-Reset to 0 at the start of each `jsonToTree()` call to ensure deterministic IDs.
-
-**`traverseJson` — recursive core:**
-
-```typescript
-function traverseJson(value: JsonValue, name: string, depth: number): TreeNode {
-  const type = getDataType(value)
-  const node: TreeNode = {
-    id: `node-${nodeIdCounter++}`,
-    name,
-    value: formatValue(value, type),  // abbreviated display string
-    type,
-    children: [],
-    isExpanded: depth < 2,
-    depth
-  }
-
-  if (type === 'object' || type === 'array') {
-    const entries = type === 'array'
-      ? (value as JsonValue[]).map((v, i) => ({ key: String(i), value: v }))
-      : Object.entries(value as object).map(([k, v]) => ({ key: k, value: v }))
-
-    node.children = entries.map(entry => traverseJson(entry.value, entry.key, depth + 1))
-  }
-
-  return node
-}
-```
-
-**`formatValue` — display truncation:**
-
-```typescript
-function formatValue(value: JsonValue, type: DataType): string {
-  if (type === 'object') return `{${Object.keys(value as object).length}}`
-  if (type === 'array') return `[${(value as JsonValue[]).length}]`
-  if (type === 'string') {
-    const str = value as string
-    return str.length > 20 ? `"${str.slice(0, 20)}..."` : `"${str}"`
-  }
-  if (type === 'null') return 'null'
-  return String(value)
-}
-```
-
-Strings longer than 20 characters are truncated with `...` to keep 3D node labels readable.
-
----
-
-### `useTreeVisualizer` — `src/composables/use-tree-visualizer.ts`
-
-The most complex composable — manages a complete Three.js scene lifecycle.
-
-**Non-reactive Three.js objects** (let variables, not refs):
-
-```typescript
-let scene: THREE.Scene | null = null
-let camera: THREE.PerspectiveCamera | null = null
-let renderer: THREE.WebGLRenderer | null = null
-let composer: EffectComposer | null = null
-let controls: OrbitControls | null = null
-let animationFrameId: number | null = null
-let nodeVisuals: Map<string, NodeVisual> = new Map()
-let edgesGroup: THREE.Group | null = null
-let particlesGroup: THREE.Group | null = null
-let raycaster: THREE.Raycaster | null = null
-let mouse: THREE.Vector2 | null = null
-let rootTreeNode: TreeNode | null = null
-```
-
-Three.js objects are kept outside Vue's reactivity system intentionally — wrapping them in `ref()` would cause Vue to deeply proxy every property, breaking Three.js's internal math and causing performance degradation.
-
-**`NodeVisual` interface:**
-
-```typescript
-interface NodeVisual {
-  group: THREE.Group       // parent transform group
-  mesh: THREE.Mesh         // sphere geometry for raycasting
-  node: TreeNode           // reference back to data
-  label: THREE.Sprite      // canvas-texture text label
-  expandIcon: THREE.Sprite | null
-  glow: THREE.PointLight   // per-node colored light
-  edges: THREE.Mesh[]      // tube geometries for connections
-  worldX: number           // current world X (updated on drag)
-  worldY: number
-}
-```
-
-#### Scene Constants
-
-```typescript
-const NODE_RADIUS = 0.5
-const HORIZONTAL_SPACING = 8   // units between parent and child columns
-const VERTICAL_SPACING = 3     // units between sibling rows
-```
-
-#### `initialize(treeData)` — Scene Setup
-
-```typescript
-// Camera: PerspectiveCamera(fov=60, near=0.1, far=1000)
-camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000)
-camera.position.set(20, 0, 40)  // slightly right and far back
-
-// Scene background + exponential fog
-scene = new THREE.Scene()
-scene.background = new THREE.Color(0x020617)  // slate-950
-scene.fog = new THREE.FogExp2(0x020617, 0.008) // density 0.008
-
-// Lights: ambient (0.4) + directional (0.8, casts shadow) + blue spot
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
-directionalLight.castShadow = true
-const blueSpot = new THREE.SpotLight(0x6366f1, 2)
-
-// Renderer: antialiased, high-performance, PCFSoft shadows
-renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
-
-// Post-processing: Bloom effect
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), 1.5, 0.4, 0.85)
-bloomPass.threshold = 0.2
-bloomPass.strength = 0.8
-bloomPass.radius = 0.5
-
-// OrbitControls: damping=0.05, panning, distance [5..200]
-controls.enableDamping = true
-controls.dampingFactor = 0.05
-controls.minDistance = 5
-controls.maxDistance = 200
-```
-
-#### `createNodeVisual(node, x, y)` — Node Construction
-
-Each visible tree node becomes a `THREE.Group` containing:
-
-1. **Sphere** (`SphereGeometry(0.5, 32, 32)`) with `MeshPhysicalMaterial` — metalness 0.1, roughness 0.2, clearcoat 1.0, plus emissive glow at 20% intensity.
-2. **PointLight** (`intensity=0`) positioned at `(0,0,1)` — lit up to 2.0 on hover.
-3. **Label Sprite** — canvas-texture `THREE.Sprite` with a rounded-rect background, colored border, and white text. Scale `(6, 0.85, 1)`. `depthTest: false` forces labels to render on top.
-4. **Expand Icon Sprite** — 64×64 canvas with a circle and `+`/`−` text, positioned at `(0, -0.8, 0.5)`.
-
-#### `createEdge(fromVisual, toVisual)` — Bezier Tube
-
-```typescript
-const midX = x1 + (x2 - x1) * 0.5
-const curve = new THREE.CubicBezierCurve3(
-  new THREE.Vector3(x1, y1, 0),
-  new THREE.Vector3(midX, y1, 0),  // control point 1: horizontal exit
-  new THREE.Vector3(midX, y2, 0),  // control point 2: horizontal entry
-  new THREE.Vector3(x2, y2, 0)
-)
-const geometry = new THREE.TubeGeometry(curve, 20, 0.05, 8, false)
-```
-
-An S-curve connecting two nodes: leaves the parent horizontally, curves to arrive at the child horizontally. Rendered as a tube (radius 0.05) with 8-sided cross-section and 20 segments for smoothness. Opacity 0.4.
-
-#### `layoutTree(node, x, startY)` — Recursive Layout Algorithm
-
-Uses a subtree-height calculation to vertically center parent nodes relative to their children.
-
-```typescript
-function calculateSubtreeHeight(n: TreeNode): number {
-  if (!n.isExpanded || n.children.length === 0) return VERTICAL_SPACING
-  return Math.max(VERTICAL_SPACING, sum of children's subtree heights)
-}
-
-function layoutSubtree(n: TreeNode, px: number, py: number): number {
-  positions.set(n.id, { x: px, y: py })
-  const childX = px + HORIZONTAL_SPACING  // children one column to the right
-  // Stack children top-to-bottom, centering the group at py
-  let currentY = py + (totalHeight - VERTICAL_SPACING) / 2
-  for each child:
-    place child at currentY - childHeight/2 + VERTICAL_SPACING/2
-    currentY -= childHeight
-}
-```
-
-#### Mouse Interaction
-
-**Raycasting for hover/click:**
-
-```typescript
-raycaster.setFromCamera(mouse, camera)
-const meshes = Array.from(nodeVisuals.values()).map(nv => nv.mesh)
-const intersects = raycaster.intersectObjects(meshes)
-```
-
-Mouse coordinates are normalized to `[-1, 1]` NDC before raycasting:
-
-```typescript
-mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-```
-
-**Hover effects:** `emissiveIntensity` set to 1.0, `glow.intensity` to 2, group scale to 1.1, label scale to `(7.5, 1.05, 1)`.
-
-**Drag:** Uses a `THREE.Plane(normal=(0,0,1))` coplanar with the node's position. Raycaster intersects this plane to find world-space drag position, offset by the click offset vector.
-
-**Click to expand/collapse:** If not dragging and a node with children is clicked, toggles `node.isExpanded` and calls `buildVisualization()` to rebuild the entire scene.
-
-#### `createParticels()` — Background Particles
-
-1000 particles in a 200×200×100 volume, randomly colored indigo (`0x6366f1`) or emerald (`0x10b981`), opacity 0.6. The group rotates at `0.0005 rad/frame` around the Y axis in `animate()`.
-
-#### Resource Management — `dispose()`
-
-Cancels the animation frame, removes all DOM event listeners, calls `dispose()` on all tracked geometries and materials (stored in the `disposables` array), removes the `renderer.domElement` from the container, and nulls all Three.js references.
-
-#### Return Shape
-
-```typescript
-return {
-  state,            // Ref<VisualizerState> — { isInitialized, hoveredNode, isDragging, isAutoRotating }
-  initialize,       // (treeData: TreeNode) => void
-  dispose,          // () => void — full cleanup
-  zoomIn,           // () => void — 0.8× current distance
-  zoomOut,          // () => void — 1.25× current distance
-  resetView,        // () => void — camera to (20,0,40), target to origin
-  expandAll,        // () => void — recursively expands all nodes
-  collapseAll,      // () => void — collapses all, keeps root expanded
-  toggleAutoRotate, // () => void — toggles OrbitControls.autoRotate
-}
-```
 
 ---
 
@@ -1718,34 +1471,6 @@ export interface ValidationResult {
 
 `JsonArray extends Array<JsonValue>` rather than being a type alias so it participates in nominal typing and is distinguishable from plain arrays.
 
-### `src/types/tree-visualization.ts`
-
-```typescript
-export interface TreeNode {
-  id: string           // "node-N" sequential ID
-  name: string         // key name or array index
-  value: string        // abbreviated display string
-  type: DataType
-  children: TreeNode[]
-  isExpanded: boolean  // mutable by Three.js click handler
-  depth: number
-}
-
-export interface NodeColorMap {
-  object: string; array: string; string: string
-  number: string; boolean: string; null: string
-}
-
-export const NODE_COLORS: NodeColorMap = {
-  object: '#f97316',   // orange
-  array: '#06b6d4',    // cyan
-  string: '#10b981',   // emerald
-  number: '#6366f1',   // indigo
-  boolean: '#ec4899',  // pink
-  null: '#64748b'      // slate
-}
-```
-
 ### `src/types/image-editor.ts`
 
 ```typescript
@@ -1901,7 +1626,7 @@ Custom utility classes:
 ### Production Build Characteristics
 
 - **Base path:** `/lit-code/` — all chunks and assets are prefixed
-- **Code splitting:** Vite automatically code-splits dynamic imports; Three.js (~1 MB) is the dominant chunk
+- **Code splitting:** Vite automatically code-splits dynamic imports
 - **Asset handling:** Images, fonts served from `/lit-code/assets/`
 - **Browser targets:** ES2020+ (Vite default) — no IE11 support
 

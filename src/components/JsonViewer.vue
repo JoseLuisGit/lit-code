@@ -2,7 +2,6 @@
 import { computed, watch, ref, onMounted, onUnmounted } from 'vue'
 import { useJsonValidator } from '../composables/use-json-validator'
 import JsonNode from './JsonNode.vue'
-import JsonTreeModal from './JsonTreeModal.vue'
 import type { Theme } from '../composables/use-theme'
 
 interface Props {
@@ -24,17 +23,8 @@ const hasData = computed(() => parsedData.value !== null)
 const hasError = computed(() => errorMessage.value !== null)
 const isEmpty = computed(() => !props.jsonText.trim())
 
-const isModalOpen = ref(false)
 const viewerKey = ref(0)
 const initialExpandDepth = ref(2)
-
-function openModal(): void {
-  isModalOpen.value = true
-}
-
-function closeModal(): void {
-  isModalOpen.value = false
-}
 
 function expandAll(): void {
   initialExpandDepth.value = 999
@@ -146,22 +136,6 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
           </button>
         </div>
 
-        <!-- 3D Button -->
-        <button
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 transition-all shadow-sm"
-          :class="isDark
-            ? 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500'
-            : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800'"
-          @click="openModal"
-          title="Abrir visualización 3D"
-          aria-label="Abrir visualización 3D del árbol JSON"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-          </svg>
-          <span>Vista 3D</span>
-        </button>
-
         <!-- Fullscreen Button -->
         <button
           @click="toggleFullscreen"
@@ -261,12 +235,6 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
       </div>
     </div>
 
-    <!-- 3D Modal -->
-    <JsonTreeModal
-      :isOpen="isModalOpen"
-      :jsonData="parsedData"
-      @close="closeModal"
-    />
       </div>
     </div>
   </Teleport>

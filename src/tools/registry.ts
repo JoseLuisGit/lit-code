@@ -14,7 +14,7 @@ export const toolRegistry: Tool[] = [
   {
     id: 'json-viewer',
     name: 'JSON Viewer',
-    description: 'Visualize, format, and explore JSON data structures with an interactive tree view and 3D graph.',
+    description: 'Visualize, format, and explore JSON data structures with an interactive tree view.',
     icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
     iconViewBox: '0 0 24 24',
     status: 'active',
