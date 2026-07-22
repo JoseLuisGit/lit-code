@@ -36,6 +36,15 @@ A collection of developer tools built with Vue 3, TypeScript, and Tailwind CSS. 
 - Ready-to-copy code snippets in TypeScript, JavaScript, PHP and Java with per-language escaping and flag mapping
 - Built-in example library (email, URL, ISO date, IPv4, hex color, phone, password, and more)
 
+### JWT Decoder
+- Decode header and payload on the fly as you paste a token
+- Colored JSON view (reuses the JSON syntax highlighter)
+- Live expiry status: Valid / Expired / Not yet valid / Unknown, with countdown updated every second
+- Registered claims panel: `exp`, `iat`, `nbf` (timestamp + absolute date + relative), `iss`, `sub`, `aud`, `jti`
+- UTF-8 safe payload decoding (handles accented and non-Latin characters)
+- Built-in example tokens (valid, expired, not-yet, no-expiry, UTF-8)
+- Note: the signature is **not verified** — this tool decodes tokens for inspection only
+
 #### How to use
 1. Type a pattern in the `/.../` bar — matching runs live.
 2. Toggle flags by clicking their buttons (hover for a description).
@@ -72,20 +81,25 @@ App.vue                            # Thin shell — gradient bg + <Transition> r
 ├── views/TextCompareView.vue      # Text Compare tool
 ├── views/Base64View.vue           # Base64 Encoder / Decoder tool
 ├── views/ColorPaletteView.vue     # Color Palette tool
-└── views/RegexTesterView.vue      # Regex Tester tool
+├── views/RegexTesterView.vue      # Regex Tester tool
+└── views/JwtDecoderView.vue       # JWT Decoder tool
 
 tools/registry.ts                  # Central tool registry (id, name, status, tags)
 types/regex.ts                     # Regex Tester type definitions
+types/jwt.ts                       # JWT Decoder type definitions
 utils/text-diff.ts                 # Pure LCS diff algorithm (no Vue, no DOM)
 utils/base64.ts                    # Pure Base64 encode/decode utilities
 utils/color-utils.ts               # Pure color math: HEX↔RGB↔HSL + palette generators
 utils/regex-engine.ts              # Pure regex compile/match/replace/highlight logic
 utils/regex-snippets.ts            # TS/JS/PHP/Java code snippet generators
 utils/regex-examples.ts            # Built-in regex example library
+utils/jwt.ts                       # Pure JWT base64url decode + claim analysis
+utils/jwt-examples.ts              # Built-in JWT example tokens
 composables/use-text-diff.ts       # Reactive diff state and navigation
 composables/use-base64.ts          # Reactive Base64 encode/decode state
 composables/use-color-palette.ts   # Reactive color picker and palette state
 composables/use-regex-tester.ts    # Reactive regex testing state
+composables/use-jwt.ts             # Reactive JWT decode state with live clock
 composables/use-theme.ts           # 5-theme system with localStorage persistence
 components/ToolHeader.vue          # Reusable header with back button + ThemeSelector
 ```
