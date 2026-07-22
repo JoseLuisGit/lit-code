@@ -37,6 +37,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/RegexTesterView.vue'),
   },
   {
+    path: '/jwt-decoder',
+    name: 'jwt-decoder',
+    component: () => import('../views/JwtDecoderView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/',
   },

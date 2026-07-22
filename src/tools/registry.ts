@@ -65,6 +65,15 @@ export const toolRegistry: Tool[] = [
     status: 'active',
     tags: ['design', 'color', 'converter'],
   },
+  {
+    id: 'jwt-decoder',
+    name: 'JWT Decoder',
+    description: 'Decode and inspect JSON Web Tokens with colored header/payload and live expiry status.',
+    icon: 'M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.977 21.977 0 0012 11c0-2.396.5-4.672 1.39-6.724',
+    iconViewBox: '0 0 24 24',
+    status: 'active',
+    tags: ['jwt', 'auth', 'token'],
+  },
 ]
 
 export function findTool(id: string): Tool | undefined {
