@@ -42,6 +42,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/JwtDecoderView.vue'),
   },
   {
+    path: '/json-to-typescript',
+    name: 'json-to-typescript',
+    component: () => import('../views/JsonToTsView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/',
   },

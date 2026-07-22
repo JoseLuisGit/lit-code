@@ -74,6 +74,15 @@ export const toolRegistry: Tool[] = [
     status: 'active',
     tags: ['jwt', 'auth', 'token'],
   },
+  {
+    id: 'json-to-typescript',
+    name: 'JSON to TypeScript',
+    description: 'Generate TypeScript interfaces from JSON with enums, format detection, and configurable output.',
+    icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
+    iconViewBox: '0 0 24 24',
+    status: 'active',
+    tags: ['json', 'typescript', 'codegen'],
+  },
 ]
 
 export function findTool(id: string): Tool | undefined {

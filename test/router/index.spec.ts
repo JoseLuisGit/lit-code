@@ -15,6 +15,7 @@ describe('router', () => {
       'color-palette',
       'regex-tester',
       'jwt-decoder',
+      'json-to-typescript',
     ]
     for (const path of toolPaths) {
       expect(router.resolve(`/${path}`).name, path).toBe(path)
