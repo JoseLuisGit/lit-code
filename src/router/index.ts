@@ -32,6 +32,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/ColorPaletteView.vue'),
   },
   {
+    path: '/regex-tester',
+    name: 'regex-tester',
+    component: () => import('../views/RegexTesterView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/',
   },

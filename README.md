@@ -29,7 +29,29 @@ A collection of developer tools built with Vue 3, TypeScript, and Tailwind CSS. 
 - "Copy as CSS vars" per palette row
 
 ### Regex Tester
-Coming soon.
+- Live match highlighting over the test string as you type
+- Flag toggles (`g`, `i`, `m`, `s`, `u`, `y`) with descriptions
+- Match list with numbered positions and capture groups (named groups supported)
+- Replace mode with `$1`, `$&`, `$<name>` substitution preview
+- Ready-to-copy code snippets in TypeScript, JavaScript, PHP and Java with per-language escaping and flag mapping
+- Built-in example library (email, URL, ISO date, IPv4, hex color, phone, password, and more)
+
+#### How to use
+1. Type a pattern in the `/.../` bar — matching runs live.
+2. Toggle flags by clicking their buttons (hover for a description).
+3. Paste a test string — matches highlight in place and list on the right.
+4. Switch to **Replace** to preview substitutions.
+5. Open the **Code** tab to copy a snippet in your language.
+
+#### Flag mapping across languages
+| JS | PHP (PCRE) | Java (`Pattern`) |
+|----|------------|------------------|
+| `i` | `i` | `CASE_INSENSITIVE` |
+| `m` | `m` | `MULTILINE` |
+| `s` | `s` | `DOTALL` |
+| `u` | `u` | `UNICODE_CHARACTER_CLASS` |
+| `g` | `preg_match_all` / `preg_replace` | loop with `Matcher.find()` |
+| `y` | not supported | not supported |
 
 ## Commands
 
@@ -49,15 +71,21 @@ App.vue                            # Thin shell — gradient bg + <Transition> r
 │       └── DiffOutputPanel.vue   # One diff panel side (left/right)
 ├── views/TextCompareView.vue      # Text Compare tool
 ├── views/Base64View.vue           # Base64 Encoder / Decoder tool
-└── views/ColorPaletteView.vue     # Color Palette tool
+├── views/ColorPaletteView.vue     # Color Palette tool
+└── views/RegexTesterView.vue      # Regex Tester tool
 
 tools/registry.ts                  # Central tool registry (id, name, status, tags)
+types/regex.ts                     # Regex Tester type definitions
 utils/text-diff.ts                 # Pure LCS diff algorithm (no Vue, no DOM)
 utils/base64.ts                    # Pure Base64 encode/decode utilities
 utils/color-utils.ts               # Pure color math: HEX↔RGB↔HSL + palette generators
+utils/regex-engine.ts              # Pure regex compile/match/replace/highlight logic
+utils/regex-snippets.ts            # TS/JS/PHP/Java code snippet generators
+utils/regex-examples.ts            # Built-in regex example library
 composables/use-text-diff.ts       # Reactive diff state and navigation
 composables/use-base64.ts          # Reactive Base64 encode/decode state
 composables/use-color-palette.ts   # Reactive color picker and palette state
+composables/use-regex-tester.ts    # Reactive regex testing state
 composables/use-theme.ts           # 5-theme system with localStorage persistence
 components/ToolHeader.vue          # Reusable header with back button + ThemeSelector
 ```
